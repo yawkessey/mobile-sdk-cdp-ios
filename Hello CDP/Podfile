@@ -7,5 +7,6 @@ target 'Hello CDP' do
 
   # Pods for Hello CDP
   pod 'MarketingCloud-Cdp', '~> 2.0.4'
+  pod 'MarketingCloudSDK', '~> 7.6'
 
 end

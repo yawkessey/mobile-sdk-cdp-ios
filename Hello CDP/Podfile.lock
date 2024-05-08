@@ -1,0 +1,24 @@
+PODS:
+  - MarketingCloud-Cdp (2.0.4):
+    - MarketingCloud-SFMCSdk (~> 1.1.0)
+  - MarketingCloud-SFMCSdk (1.1.2)
+  - MarketingCloudSDK (7.6.0)
+
+DEPENDENCIES:
+  - MarketingCloud-Cdp (~> 2.0.4)
+  - MarketingCloudSDK (~> 7.6)
+
+SPEC REPOS:
+  trunk:
+    - MarketingCloud-Cdp
+    - MarketingCloud-SFMCSdk
+    - MarketingCloudSDK
+
+SPEC CHECKSUMS:
+  MarketingCloud-Cdp: 3de32021076570d05fd41988a439b6cfea12ef3c
+  MarketingCloud-SFMCSdk: 53e02577c9709cab3c366b944ee922b96b5fd253
+  MarketingCloudSDK: 8a81c3d08499e69c27bc32798fc81a68a51e2e67
+
+PODFILE CHECKSUM: de7b981e70f5e4d1d447acf17ed0825b7b2aae47
+
+COCOAPODS: 1.15.2

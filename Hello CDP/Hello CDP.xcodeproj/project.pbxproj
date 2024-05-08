@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -17,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4A12926D2BE03ACD00A299B1 /* Hello CDP.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Hello CDP.entitlements"; sourceTree = "<group>"; };
 		6A204B85256453B200833D05 /* Hello CDP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hello CDP.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A204B88256453B200833D05 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6A204B8C256453B200833D05 /* SdkStateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SdkStateViewController.swift; sourceTree = "<group>"; };
@@ -71,6 +72,7 @@
 		6A204B87256453B200833D05 /* Hello CDP */ = {
 			isa = PBXGroup;
 			children = (
+				4A12926D2BE03ACD00A299B1 /* Hello CDP.entitlements */,
 				6A204B88256453B200833D05 /* AppDelegate.swift */,
 				6AB877C8256F225C000B1A4C /* HelloCDPLogOutputter.swift */,
 				6A204B8C256453B200833D05 /* SdkStateViewController.swift */,
@@ -103,6 +105,7 @@
 				6A204B82256453B200833D05 /* Frameworks */,
 				6A204B83256453B200833D05 /* Resources */,
 				A5571B4AEE2621DE3A43DD9C /* [CP] Embed Pods Frameworks */,
+				47E543346E95E7163D403B04 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -160,6 +163,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		47E543346E95E7163D403B04 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Hello CDP/Pods-Hello CDP-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Hello CDP/Pods-Hello CDP-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Hello CDP/Pods-Hello CDP-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		63FB41287113CF79DF10E5CE /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -355,8 +375,9 @@
 			baseConfigurationReference = F3C379CE7373F60F9519779A /* Pods-Hello CDP.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Hello CDP/Hello CDP.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RNQ52E7G3P;
+				DEVELOPMENT_TEAM = XD7TD9S6ZU;
 				INFOPLIST_FILE = "Hello CDP/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -364,7 +385,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.salesforce.Hello-CDP";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.salesforce.Hello-CDP2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -376,8 +397,9 @@
 			baseConfigurationReference = A302D12224725E14A76641C1 /* Pods-Hello CDP.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Hello CDP/Hello CDP.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = RNQ52E7G3P;
+				DEVELOPMENT_TEAM = XD7TD9S6ZU;
 				INFOPLIST_FILE = "Hello CDP/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -385,7 +407,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.salesforce.Hello-CDP";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.salesforce.Hello-CDP2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

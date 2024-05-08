@@ -1,0 +1,4 @@
+${PODS_ROOT}/Target Support Files/Pods-Hello CDP/Pods-Hello CDP-frameworks.sh
+${PODS_XCFRAMEWORKS_BUILD_DIR}/MarketingCloud-Cdp/Cdp.framework/Cdp
+${PODS_XCFRAMEWORKS_BUILD_DIR}/MarketingCloud-SFMCSdk/SFMCSDK.framework/SFMCSDK
+${PODS_XCFRAMEWORKS_BUILD_DIR}/MarketingCloudSDK/MarketingCloudSDK.framework/MarketingCloudSDK
