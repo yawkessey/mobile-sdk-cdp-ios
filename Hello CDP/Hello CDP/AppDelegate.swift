@@ -17,11 +17,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MarketingCloudSDKEventDel
 
     var window: UIWindow?
     
-    let appID = "afe3daf4-29ef-413a-94e8-4e6184fa13a4"
-    let accessToken = "4Rvs1U5LsMX9MPufc8smmjs7"
-    let appEndpoint = "https://mcpd5g4j8b177kkqm8xjpk9nvwsm.device-qa3.marketingcloudqaapis.com/"
+    // Marketing Cloud Configuration
+    let mcAppID = "afe3daf4-29ef-413a-94e8-4e6184fa13a4"
+    let mcAccessToken = "4Rvs1U5LsMX9MPufc8smmjs7"
+    let mcAppEndpoint = "https://mcpd5g4j8b177kkqm8xjpk9nvwsm.device-qa3.marketingcloudqaapis.com/"
     let mid = "524000406"
+    // Device Token is set in another function
     var deviceToken = ""
+    
+    let cdpAppId: String = "4c28bb84-dfa2-470a-b361-d7c694a79309" // <-- ** UPDATE your Source ID **
+    let cdpEndpoint: String = "https://gnqw0zbqmfsdqndgh14d8zrxm8.pc-rnd.c360a.salesforce.com" // <-- ** UPDATE your Tenant Specific Endpoint **
+
 
     // Define features of MobilePush your app will use.
     let inbox = true
@@ -61,8 +67,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MarketingCloudSDKEventDel
     func getCDPConfig() -> ModuleConfig {
         // TODO: Replace Data Cloud (CDP) Mobile App connector properties
         return CdpConfigBuilder(
-            appId: "4c28bb84-dfa2-470a-b361-d7c694a79309", // <-- ** UPDATE your Source ID **
-            endpoint: "https://gnqw0zbqmfsdqndgh14d8zrxm8.pc-rnd.c360a.salesforce.com" // <-- ** UPDATE your Tenant Specific Endpoint **
+            appId: cdpAppId, // <-- ** UPDATE your Source ID **
+            endpoint: cdpEndpoint // <-- ** UPDATE your Tenant Specific Endpoint **
         )
         .trackScreens(false) // default: false
         .trackLifecycle(false) // default: false
@@ -76,9 +82,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MarketingCloudSDKEventDel
         // Use the builder method to configure the SDK for usage. This gives you the maximum flexibility in SDK configuration.
         // The builder lets you configure the SDK parameters at runtime.
         let builder = MarketingCloudSDKConfigBuilder()
-            .sfmc_setApplicationId(appID)
-            .sfmc_setAccessToken(accessToken)
-            .sfmc_setMarketingCloudServerUrl(appEndpoint)
+            .sfmc_setApplicationId(mcAppID)
+            .sfmc_setAccessToken(mcAccessToken)
+            .sfmc_setMarketingCloudServerUrl(mcAppEndpoint)
             .sfmc_setMid(mid)
             .sfmc_setInboxEnabled(inbox as NSNumber)
             .sfmc_setLocationEnabled(location as NSNumber)

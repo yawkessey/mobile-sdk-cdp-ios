@@ -17,6 +17,7 @@ import MarketingCloudSDK
 class SdkStateViewController: UIViewController {
     var locationManager = CLLocationManager()
     var currentLocation: CLLocation?
+    var authToken: String?
     
     @IBOutlet var token: UIView!
     @IBOutlet weak var outputSegmentedControl: UISegmentedControl!
@@ -30,7 +31,7 @@ class SdkStateViewController: UIViewController {
         super.viewDidAppear(animated)
         
         optInSwitch.isOn = SFMCSdk.cdp.getConsent() == Consent.optIn
-        //refreshOutput()
+        refreshOutput()
     }
     
     @IBAction func toggleConsent(_ sender: Any) {
@@ -50,40 +51,22 @@ class SdkStateViewController: UIViewController {
     }
     
     @IBAction func sendProfileEvent(_ sender: Any) {
-        //        let profileAttributes = [
-        //          "isAnonymous": "0",
-        //          "firstName": "John",
-        //          "lastName": "Smith",
-        //          "email": "john.smith@domain.com",
-        //          "phoneNumber": "1234567890"
-        //        ]
-        //        SFMCSdk.identity.setProfileAttributes([.cdp: profileAttributes])
-        //
-        
-        
         if let deviceID = getDeviceID() {
-               print("Using Device ID: \(deviceID)")
-               // Use the deviceID in your event data
-               postEvents(deviceID: deviceID)
-           } else {
-               print("Device ID not available")
-               // Handle the case where device ID is not available
-           }
-        
-//        getDeviceToken()
-        authenticate();
+                print("Using Device ID: \(deviceID)")
+                authenticate { [weak self] success in
+                    guard let self = self else { return }
+                    if success {
+                        self.postEvents(deviceID: deviceID)
+                    } else {
+                        print("Authentication failed")
+                    }
+                    self.refreshOutput()
+                }
+            } else {
+                print("Device ID not available")
+            }
         refreshOutput()
     }
-//    // Get Device Token
-//    func getDeviceToken() -> String? {
-//        // Access the deviceToken property from the AppDelegate
-//        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-//            print("Failed to retrieve AppDelegate")
-//            return nil
-//        }
-//        print("appDelegate.deviceToken", appDelegate.deviceToken)
-//        return appDelegate.deviceToken
-//    }
     
     // Get Device ID
     func getDeviceID() -> String? {
@@ -99,110 +82,125 @@ class SdkStateViewController: UIViewController {
     }
     
     // Authenticate
-    func authenticate(){
-        let url = URL(string: "https://hbtg09b-h03g8yrygfstsmjzm0.pc-rnd.c360a.salesforce.com/authentication")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("AWSALB=RHEV6Z5aevN/Zu4nLIVJzQYzcZFbU29nN+dZv3GcNbxsgfr7VfhxNWmpgyi39RNotaM2RzWb0fH8CqVwUV4U8z8bdC+rAwjYftL7fBA8UkurrtfO7s7/dhGBCwyR; AWSALBCORS=RHEV6Z5aevN/Zu4nLIVJzQYzcZFbU29nN+dZv3GcNbxsgfr7VfhxNWmpgyi39RNotaM2RzWb0fH8CqVwUV4U8z8bdC+rAwjYftL7fBA8UkurrtfO7s7/dhGBCwyR", forHTTPHeaderField: "Cookie")
-        
-        let body: [String: Any] = [
-            "appSourceId": "54b13760-0c57-4c2c-ba84-6328eceacd01",
-            "deviceId": "MobileSDKDevice"
-        ]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
-        
-        let session = URLSession.shared
-        let task = session.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Client error: \(error.localizedDescription)")
-                return
-            }
+    func authenticate(completion: @escaping (Bool) -> Void){
+        DispatchQueue.main.async {
+            let url = URL(string: AppDelegate.shared.cdpEndpoint + "/authentication")!
+            print("url:", url)
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue("AWSALB=RHEV6Z5aevN/Zu4nLIVJzQYzcZFbU29nN+dZv3GcNbxsgfr7VfhxNWmpgyi39RNotaM2RzWb0fH8CqVwUV4U8z8bdC+rAwjYftL7fBA8UkurrtfO7s7/dhGBCwyR; AWSALBCORS=RHEV6Z5aevN/Zu4nLIVJzQYzcZFbU29nN+dZv3GcNbxsgfr7VfhxNWmpgyi39RNotaM2RzWb0fH8CqVwUV4U8z8bdC+rAwjYftL7fBA8UkurrtfO7s7/dhGBCwyR", forHTTPHeaderField: "Cookie")
             
-            guard let httpResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpResponse.statusCode) else {
-                print("Server error")
-                return
-            }
+            let body: [String: Any] = [
+                "appSourceId": AppDelegate.shared.cdpAppId,
+                "deviceId": "MobileSDKDevice"
+            ]
+            request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
             
-            if let data = data, let string = String(data: data, encoding: .utf8) {
-                print(string)
+            let session = URLSession.shared
+            let task = session.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Client error: \(error.localizedDescription)")
+                    completion(false)
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    print("Server error")
+                    completion(false)
+                    return
+                }
+                
+                if let data = data, let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let token = json["token"] as? String {
+                    self.authToken = token
+                    completion(true)
+                } else {
+                    print("Failed to parse token")
+                    completion(false)
+                }
             }
+            task.resume()
         }
-        task.resume()
-        
     }
     
     func postEvents(deviceID: String){
-        let urlString = "https://hbtg09b-h03g8yrygfstsmjzm0.pc-rnd.c360a.salesforce.com/events"
-        let url = URL(string: urlString)!
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJBVVRIIiwiYXVkIjoiTW9iaWxlU0RLRGV2aWNlIiwibmJmIjoxNzE2NDkyMzg1LCJpc3MiOiJhMzYwXC9mYWxjb250ZXN0XC9jOGQ0NzQzM2M1NzY0NzNiYjE0ZGEzYTM0NzkxMDViYSIsInRlbmFudElkIjoiYTM2MFwvZmFsY29udGVzdFwvYzhkNDc0MzNjNTc2NDczYmIxNGRhM2EzNDc5MTA1YmEiLCJleHAiOjE3MTY0OTIzODUsImFwcFNvdXJjZUlkIjoiNTRiMTM3NjAtMGM1Ny00YzJjLWJhODQtNjMyOGVjZWFjZDAxIiwiaWF0IjoxNzEzOTAwMzg1LCJkZXZpY2VJZCI6Ik1vYmlsZVNES0RldmljZSIsImp0aSI6IjI2ZGMzM2YyLTU2ZWMtNDE0Zi04NjhlLWFiZGY4M2JiNmQzOCJ9.8fRIne_dJf6VwKRbDyBqdfaka_qSL2-5aBScxCFpQDI", forHTTPHeaderField: "auth_token")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = """
-        {
-            "events": [
-                {
-                    "deviceId": "\(deviceID)",
-                    "individualId": "Testing",
-                    "eventId": "event-id-2222222222",
-                    "dateTime": "2023-02-08T22:03:00.000Z",
-                    "eventType": "individual",
-                    "category": "profile",
-                    "sessionId": "41315BE2-8D90-4D86-BB39-814262F38BA3",
-                    "firstName": "yaw",
-                    "lastName": "ankomah"
-                },
-                {
-                    "deviceId": "\(deviceID)",
-                    "individualId": "Testing",
-                    "eventId": "event-id-2222222222",
-                    "dateTime": "2023-07-04T22:03:00.000Z",
-                    "eventType": "device",
-                    "category": "profile",
-                    "sessionId": "41315BE2-8D90-4D86-BB39-814262F38BA3",
-                    "deviceSystemToken": "\(AppDelegate.shared.deviceToken)",
-                    "deviceType": "iPhone",
-                    "gcmSenderId": "gcm123",
-                    "osName": "iOS",
-                    "osVersion": "17.4"
-                },
-                {
-                    "deviceId": "\(deviceID)",
-                    "contactPointAppId": "Testing",
-                    "isActive": "True",
-                    "eventId": "event-id-2222222222",
-                    "dateTime": "2023-07-04T22:03:00.000Z",
-                    "eventType": "contactPointApp",
-                    "individualId": "yaw-test1",
-                    "category": "profile",
-                    "sessionId": "41315BE2-8D90-4D86-BB39-814262F38BA3",
-                    "sdkVersionName": "ver1",
-                    "isUndeliverable": 0
-                }
-            ]
-        }
-        """.data(using: .utf8)
-        
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Error: \(error)")
+        DispatchQueue.main.async {
+            guard let authToken = self.authToken else {
+                print("Auth token is not available")
                 return
             }
-
-            if let httpResponse = response as? HTTPURLResponse {
-                print("HTTP Status Code: \(httpResponse.statusCode)")
+            
+            let url = URL(string: AppDelegate.shared.cdpEndpoint + "/events")!
+            print("url:", url)
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue(authToken, forHTTPHeaderField: "auth_token")
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = """
+            {
+                "events": [
+                    {
+                        "deviceId": "\(deviceID)",
+                        "individualId": "Testing",
+                        "eventId": "event-id-2222222222",
+                        "dateTime": "2023-02-08T22:03:00.000Z",
+                        "eventType": "individual",
+                        "category": "profile",
+                        "sessionId": "41315BE2-8D90-4D86-BB39-814262F38BA3",
+                        "firstName": "yaw",
+                        "lastName": "ankomah"
+                    },
+                    {
+                        "deviceId": "\(deviceID)",
+                        "individualId": "Testing",
+                        "eventId": "event-id-2222222222",
+                        "dateTime": "2023-07-04T22:03:00.000Z",
+                        "eventType": "device",
+                        "category": "profile",
+                        "sessionId": "41315BE2-8D90-4D86-BB39-814262F38BA3",
+                        "deviceSystemToken": "\(AppDelegate.shared.deviceToken)",
+                        "deviceType": "iPhone",
+                        "gcmSenderId": "gcm123",
+                        "osName": "iOS",
+                        "osVersion": "17.4"
+                    },
+                    {
+                        "deviceId": "\(deviceID)",
+                        "contactPointAppId": "Testing",
+                        "isActive": "True",
+                        "eventId": "event-id-2222222222",
+                        "dateTime": "2023-07-04T22:03:00.000Z",
+                        "eventType": "contactPointApp",
+                        "individualId": "yaw-test1",
+                        "category": "profile",
+                        "sessionId": "41315BE2-8D90-4D86-BB39-814262F38BA3",
+                        "sdkVersionName": "ver1",
+                        "isUndeliverable": 0
+                    }
+                ]
             }
-
-            if let data = data {
-                let responseString = String(data: data, encoding: .utf8)
-                print("Response: \(responseString ?? "No data received")")
+            """.data(using: .utf8)
+            
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Error: \(error)")
+                    return
+                }
+                
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("HTTP Status Code: \(httpResponse.statusCode)")
+                }
+                
+                if let data = data {
+                    let responseString = String(data: data, encoding: .utf8)
+                    print("Response: \(responseString ?? "No data received")")
+                }
             }
+            task.resume()
         }
-
-        task.resume()
     }
         
         // Store Token
